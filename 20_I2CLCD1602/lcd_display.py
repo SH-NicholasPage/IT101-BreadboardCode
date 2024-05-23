@@ -1,3 +1,4 @@
+import threading
 import smbus
 
 from time import sleep
@@ -250,24 +251,34 @@ class _Adafruit_CharLCD():
                 
 # Wrapper for ADAFruitLCD display
 class LCDDisplayWrapper():
-    mcp: _PCF8574_GPIO
-    lcd: _Adafruit_CharLCD
+    _mcp: _PCF8574_GPIO
+    _lcd: _Adafruit_CharLCD
+    _scroll_thread: threading.Thread
+    _running: bool = True
+    _text_to_scroll_1: str
+    _r1_index: int
+    _r1_control: bool = False
+    _text_to_scroll_2: str
+    _r2_index: int
+    _r2_control: bool = False
     
     def __init__(self):
         # Create PCF8574 GPIO adapter.
         try:
-            self.mcp = _PCF8574_GPIO(PCF8574_address)
+            self._mcp = _PCF8574_GPIO(PCF8574_address)
         except:
             try:
-                self.mcp = _PCF8574_GPIO(PCF8574A_address)
+                self._mcp = _PCF8574_GPIO(PCF8574A_address)
             except:
                 print ('I2C Address Error !')
                 exit(1)
             
         # Create LCD, passing in MCP GPIO adapter.
-        self.lcd = _Adafruit_CharLCD(pin_rs=0, pin_e=2, pins_db=[4,5,6,7], GPIO=self.mcp)
-        self.mcp.output(3,1)     # turn on LCD backlight
-        self.lcd.begin(16,2)     # set number of LCD lines and columns
+        self._lcd = _Adafruit_CharLCD(pin_rs=0, pin_e=2, pins_db=[4,5,6,7], GPIO=self._mcp)
+        self._mcp.output(3,1)     # turn on LCD backlight
+        self._lcd.begin(16,2)     # set number of LCD lines and columns
+        self._scroll_thread = threading.Thread(target=self._scroll_text_ctrl, daemon=True)
+        self._scroll_thread.start()
         
     def display_message(self, message: str, row: int = 1, scroll = False) -> None:
         if row != 1 and row != 2:
@@ -275,8 +286,64 @@ class LCDDisplayWrapper():
         if scroll == False and len(message) > 16:
             print(f"You're attempting to display a string larger than can fit on the screen ({len(message)}/16). It will be truncated to 16 characters.")
         
-        self.lcd.setCursor(0,row - 1)  # set cursor position
-        self.lcd.message(message)
+        self._lcd.setCursor(0,row - 1)  # set cursor position
+        self._lcd.message(message)
+        
+        if scroll == False:
+            if row == 1:
+                self._r1_control = False
+            else:
+                self._r2_control = False
+        
+        if scroll:
+            if row == 1:
+                self._text_to_scroll_1 = message
+                self._r1_index = 0
+                self._r1_control = True
+            else:
+                self._text_to_scroll_2 = message
+                self._r2_index = 0
+                self._r2_control = True
+            
+    def _scroll_text_ctrl(self):
+        while self._running:
+            if self._r1_control:
+                self._scroll_text_r1()
+            if self._r2_control:
+                self._scroll_text_r2()
+            sleep(1)
+            
+    def _scroll_text_r1(self):
+        text = self._text_to_scroll_1[self._r1_index:]
+        self._lcd.setCursor(0,0)  # set cursor position
+        self._lcd.message(text.ljust(16))
+        
+        if len(text) <= 6:
+            self._r1_index = 0
+        else:
+            self._r1_index += 1
+    
+    def _scroll_text_r2(self):
+        text = self._text_to_scroll_2[self._r2_index:]
+        self._lcd.setCursor(0,1)  # set cursor position
+        self._lcd.message(text.ljust(16))
+        
+        if len(text) <= 6:
+            self._r2_index = 0
+        else:
+            self._r2_index += 1
         
     def clear(self):
-        self.lcd.clear()
+        self._r1_index = 0
+        self._r1_control = False
+        self._r2_index = 0
+        self._r2_control = False
+        self._lcd.clear()
+        
+    def close(self):
+        self.__del__()
+        
+    def __del__(self):
+        self._running = False
+        if self._scroll_thread:
+            self._scroll_thread.join()

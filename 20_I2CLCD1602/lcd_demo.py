@@ -15,13 +15,16 @@ def get_time_now():     # get system time
     return datetime.now().strftime('    %H:%M:%S')
     
 def loop():
+    lcd.display_message('Scrolling text...', 1, True)
+    sleep(6)
+    lcd.clear()    
     while(True):
-        lcd.clear()     
         lcd.display_message('CPU: ' + get_cpu_temp(), 1)# display CPU temperature
         lcd.display_message(get_time_now(), 2)   # display the time
         sleep(1)
         
 def destroy():
+    print('Terminating LCD instance. May take a moment...')
     lcd.clear()
     
 if __name__ == '__main__':
