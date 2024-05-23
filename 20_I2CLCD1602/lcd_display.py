@@ -246,6 +246,8 @@ class _Adafruit_CharLCD():
         for char in text:
             if char == '\n':
                 self.write4bits(0xC0)  # next line
+            elif char == '°':
+                self.write4bits(0b1101_1111, True)  # degree sign
             else:
                 self.write4bits(ord(char), True)
                 
@@ -294,8 +296,7 @@ class LCDDisplayWrapper():
                 self._r1_control = False
             else:
                 self._r2_control = False
-        
-        if scroll:
+        else: # Scrolling
             if row == 1:
                 self._text_to_scroll_1 = message
                 self._r1_index = 0
@@ -338,7 +339,9 @@ class LCDDisplayWrapper():
         self._r1_control = False
         self._r2_index = 0
         self._r2_control = False
+        sleep(0.25)
         self._lcd.clear()
+        sleep(0.25)
         
     def close(self):
         self.__del__()
@@ -347,3 +350,4 @@ class LCDDisplayWrapper():
         self._running = False
         if self._scroll_thread:
             self._scroll_thread.join()
+        self.clear()
