@@ -1,14 +1,14 @@
 # NOTE: If running the game gives you an error, run either "sudo apt install python3-pygame" OR "pip install pygame" in the terminal.
 
 import pygame
-import time
 import random
+from input_structure import Input
 
 pygame.init()
 
 # Set up the display
-GRID_SIZE = 28
-GRID_WIDTH, GRID_HEIGHT = 28, 24  # 28 columns x 24 rows
+GRID_SIZE = 56
+GRID_WIDTH, GRID_HEIGHT = 16, 15  # 16 columns x 15 rows
 WIDTH, HEIGHT = GRID_WIDTH * GRID_SIZE, GRID_HEIGHT * GRID_SIZE
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game - Score: 0")
@@ -20,7 +20,7 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 
 # Snake and food sizes
-SNAKE_SPEED = 10
+SNAKE_SPEED = 8
 
 # Fonts
 FONT = pygame.font.SysFont(None, 25)
@@ -42,18 +42,19 @@ def message(msg, color):
 def generate_food():
     return random.randrange(GRID_WIDTH), random.randrange(GRID_HEIGHT)
 
-def do_keypress_event(event, current_direction):
+def check_input(event, current_direction):
     global PAUSED
     # Can't double-back on your snake
-    if event.key == pygame.K_LEFT and current_direction != "RIGHT":
-        return "LEFT"
-    elif event.key == pygame.K_RIGHT and current_direction != "LEFT":
-        return "RIGHT"
-    elif event.key == pygame.K_UP and current_direction != "DOWN":
-        return "UP"
-    elif event.key == pygame.K_DOWN and current_direction != "UP":
-        return "DOWN"
-    elif event.key == pygame.K_ESCAPE: # Escape pauses the game
+    if event.key == pygame.K_LEFT and current_direction != Input.RIGHT:
+        return Input.LEFT
+    elif event.key == pygame.K_RIGHT and current_direction != Input.LEFT:
+        return Input.RIGHT
+    elif event.key == pygame.K_UP and current_direction != Input.DOWN:
+        return Input.UP
+    elif event.key == pygame.K_DOWN and current_direction != Input.UP:
+        return Input.DOWN
+    
+    if event.key == pygame.K_ESCAPE: # Escape pauses the game
         PAUSED = True
 
 # Function to main loop
@@ -70,9 +71,9 @@ def game_loop():
         # Initial snake position (// performs division and rounds down)
         snake_list = [(GRID_WIDTH // 2, GRID_HEIGHT // 2)]
         length_of_snake = 1
-
+        
         # Initial direction
-        direction = "RIGHT"
+        direction = Input.RIGHT
 
         # Food position
         food_x, food_y = generate_food()
@@ -84,7 +85,7 @@ def game_loop():
         while not game_over:
 
             # Pause mechanism
-            while PAUSED:
+            if PAUSED:
                 WINDOW.fill(BLACK)
                 message("Paused. Press [Space] to continue or [Escape] to quit.", WHITE)
                 pygame.display.update()
@@ -97,6 +98,9 @@ def game_loop():
                             # Straight kill the game
                             pygame.quit() # Kill game
                             quit() # Kill program
+                continue
+
+            temp_direction = direction
 
             # Input handling
             for event in pygame.event.get():
@@ -104,36 +108,39 @@ def game_loop():
                     pygame.quit()
                     quit()
                 if event.type == pygame.KEYDOWN:
-                    new_direction = do_keypress_event(event, direction) 
-                    direction = new_direction if new_direction != None else direction
+                    new_direction = check_input(event, direction) 
+                    temp_direction = new_direction if new_direction != None else direction
+                
+            direction = temp_direction
 
-            # Move the snake
-            x, y = snake_list[0]
-            if direction == "RIGHT":
-                x += 1
-            elif direction == "LEFT":
-                x -= 1
-            elif direction == "UP":
-                y -= 1
-            elif direction == "DOWN":
-                y += 1
+            if PAUSED == False:
+                # Move the snake
+                x, y = snake_list[0]
+                if direction == Input.RIGHT:
+                    x += 1
+                elif direction == Input.LEFT:
+                    x -= 1
+                elif direction == Input.UP:
+                    y -= 1
+                elif direction == Input.DOWN:
+                    y += 1
 
-            # Check for collision with walls or self
-            if x >= GRID_WIDTH or x < 0 or y >= GRID_HEIGHT or y < 0 or (x, y) in snake_list[1:]:
-                game_over = True
-                game_close = True
+                # Check for collision with walls or self
+                if x >= GRID_WIDTH or x < 0 or y >= GRID_HEIGHT or y < 0 or (x, y) in snake_list[1:]:
+                    game_over = True
+                    game_close = True
 
-            # Check if snake eats food
-            if x == food_x and y == food_y:
-                food_x, food_y = generate_food()
-                length_of_snake += 1
-                score += 1
-                pygame.display.set_caption(f"Snake Game - Score: {score}")
-            else:
-                snake_list.pop()
+                # Check if snake eats food
+                if x == food_x and y == food_y:
+                    food_x, food_y = generate_food()
+                    length_of_snake += 1
+                    score += 1
+                    pygame.display.set_caption(f"Snake Game - Score: {score}")
+                else:
+                    snake_list.pop()
 
-            # Update snake position
-            snake_list.insert(0, (x, y))
+                # Update snake position
+                snake_list.insert(0, (x, y))
 
             # Drawing
             WINDOW.fill(BLACK)

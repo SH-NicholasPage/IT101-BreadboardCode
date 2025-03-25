@@ -1,6 +1,7 @@
 # Description : Read Joystick state
 from pathlib import Path
 import sys
+import time
 from gpiozero import Button
 
 HERE = Path(__file__).parent.parent
@@ -14,6 +15,7 @@ class Joystick:
     ADC = ADCDevice() # Define an ADCDevice class object
     last_direction = "Neutral"
     button_pressed_momentary = False
+    last_press_time = 0
 
     def __init__(self):
         if(self.ADC.detectI2C(0x48) and self.USING_GRAVITECH_ADC): 
@@ -30,17 +32,27 @@ class Joystick:
 
     def get_xy_pos(self):   
         val_Z = self.BUTTON.is_active # read digital value of axis Z
-        val_Y = self.ADC.analogRead(0)           # read analog value of axis X and Y
+        val_Y = self.ADC.analogRead(0)  # read analog value of axis X and Y
         val_X = self.ADC.analogRead(1)
         return self.get_direction(val_X, val_Y), val_X, val_Y, val_Z
     
     def get_button_pressed(self):
         button_pressed = self.BUTTON.is_active
-        if button_pressed and not self.button_pressed_momentary:
-            self.button_pressed_momentary = True
-            return True
-        elif not button_pressed:
+        current_time = time.time()
+        
+        if button_pressed:
+            if not self.button_pressed_momentary:
+                self.button_pressed_momentary = True
+                self.last_press_time = current_time
+                return True
+            elif current_time - self.last_press_time >= 2:
+                self.last_press_time = current_time
+                return True
+            
+        else:
             self.button_pressed_momentary = False
+            self.last_press_time = 0
+            
         return False
             
     def get_direction(self, x = None, y = None):
