@@ -17,6 +17,6 @@ This repository provides basic information about the KY-008 Laser Transmitter + 
 
 The KY-008 module typically has three pins:
 
-- **S** (Signal): Connects to a digital pin on the Arduino for sending control signals.
-- **+** (Power): Connects to the 5V pin on the Arduino for supplying power.
-- **-** (Ground): Connects to the GND pin on the Arduino for grounding.
+- **S** (Signal): Connects to a digital pin on the Pi/Arduino for sending control signals.
+- **+** (Power): Connects to the 5V pin on the Pi/Arduino for supplying power.
+- **-** (Ground): Connects to the GND pin on the Pi/Arduino for grounding.
