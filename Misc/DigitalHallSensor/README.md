@@ -1,6 +1,6 @@
 # 3144E A3144 Hall Effect Sensor Module
 
-This module uses the 3144E (A3144-compatible) Hall effect sensor to detect the presence of a magnetic field. It outputs a digital voltage signal that can be used in Arduino, PIC, AVR, and other microcontroller projects.
+This module uses the 3144E (A3144-compatible) Hall effect sensor to detect the presence of a magnetic field. It outputs a digital voltage signal that can be used in RPi, Arduino, PIC, AVR, and other microcontroller projects.
 
 ## Features
 
