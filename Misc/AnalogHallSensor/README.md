@@ -12,11 +12,11 @@ The setup is suitable for measuring magnetic field strength variations as voltag
 
 ### 49E Hall Effect Sensor
 
-| Pin | Label | Description        |
-|-----|-------|--------------------|
-| 1   | VCC   | Power supply (5V)  |
-| 2   | GND   | Ground             |
-| 3   | OUT   | Analog signal out  |
+| Pin | Label | Description                                 |
+|-----|-------|---------------------------------------------|
+| 1   | VCC   | Power supply (5V)                           |
+| 2   | GND   | Ground                                      |
+| 3   | OUT   | Analog signal out (connect to A0-A7 on ADC) |
 
 See this image below to better understand the pinout:
 
