@@ -1,5 +1,6 @@
 # Analog Sensor Reader (49E Hall Effect Sensor + ADS7830 ADC)
 
+![image](https://github.com/user-attachments/assets/392debb1-253a-48f6-a2e7-f722c3ead351)
 
 ## Overview
 
@@ -16,6 +17,10 @@ The setup is suitable for measuring magnetic field strength variations as voltag
 | 1   | VCC   | Power supply (5V)  |
 | 2   | GND   | Ground             |
 | 3   | OUT   | Analog signal out  |
+
+See this image below to better understand the pinout:
+
+![image](https://github.com/user-attachments/assets/e7d05e30-0e40-4d89-afd6-e644100e6063)
 
 ### ADS7830 ADC
 
