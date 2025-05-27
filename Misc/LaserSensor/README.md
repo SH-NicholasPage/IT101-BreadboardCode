@@ -8,6 +8,10 @@ The KY-008 Laser Transmitter module is a commonly used component in Arduino and 
 
 This repository provides basic information about the KY-008 Laser Transmitter + Laser Receiver module, including pinout, sample code, and external documentation.
 
+**Note:**
+
+The transmitter likely won't receive enough power from a GPIO or Arduino digital output pin alone. For consistent performance, it's recommended to use the 5V pin directly as the signal pin, effectively powering the laser continuously.
+
 ## Documentation
 
 - [KY-008 Laser Transmitter Module Information](https://arduinomodules.info/ky-008-laser-transmitter-module/)
@@ -17,6 +21,8 @@ This repository provides basic information about the KY-008 Laser Transmitter + 
 
 The KY-008 module typically has three pins:
 
-- **S** (Signal): Connects to a digital pin on the Pi/Arduino for sending control signals.
+- **S** (Signal): Connects to a digital pin on the Pi/Arduino for sending control signals. _(Or directly to 5V for continuous power.)_
 - **+** (Power): Connects to the 5V pin on the Pi/Arduino for supplying power.
 - **-** (Ground): Connects to the GND pin on the Pi/Arduino for grounding.
+
+Note that the pinout for the receiver is the same as for the transmitter, making it easy to wire and swap between them if needed.
