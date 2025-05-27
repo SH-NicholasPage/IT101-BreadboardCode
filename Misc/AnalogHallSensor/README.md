@@ -1,4 +1,4 @@
-# Analog Sensor Reader (49E Hall Effect Sensor + ADS7830 ADC)
+# 49E Linear Hall Sensor with ADS7830 ADC 
 
 ![image](https://github.com/user-attachments/assets/392debb1-253a-48f6-a2e7-f722c3ead351)
 
