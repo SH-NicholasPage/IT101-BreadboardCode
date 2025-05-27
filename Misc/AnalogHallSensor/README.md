@@ -14,7 +14,7 @@ The setup is suitable for measuring magnetic field strength variations as voltag
 
 | Pin | Label | Description                                 |
 |-----|-------|---------------------------------------------|
-| 1   | VCC   | Power supply (5V)                           |
+| 1   | VCC   | Power supply (3.3V or 5V)                   |
 | 2   | GND   | Ground                                      |
 | 3   | OUT   | Analog signal out (connect to A0-A7 on ADC) |
 
